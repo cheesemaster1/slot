@@ -121,6 +121,18 @@ main {
   border-radius: 12px;
   background: linear-gradient(180deg, #1d1c3a, #0b0b16);
   min-height: 220px;
+  position: relative;
+  overflow: hidden;
+}
+
+.reel.spinning::after {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(108, 247, 255, 0.15), transparent);
+  animation: reel-shimmer 0.6s linear infinite;
+  pointer-events: none;
 }
 
 .symbol {
@@ -134,6 +146,19 @@ main {
   text-transform: uppercase;
   letter-spacing: 0.1rem;
   background: rgba(255, 255, 255, 0.05);
+  min-height: 58px;
+  gap: 4px;
+}
+
+.symbol-icon {
+  font-size: 1.6rem;
+  filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.25));
+}
+
+.symbol-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.15rem;
+  color: var(--muted);
 }
 
 .symbol.wild {
@@ -145,6 +170,10 @@ main {
 .symbol.scatter {
   border-color: var(--accent-soft);
   color: var(--accent-soft);
+}
+
+.reel.spinning .symbol {
+  animation: symbol-flicker 0.6s linear infinite;
 }
 
 .payline {
@@ -253,5 +282,32 @@ main {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
+  }
+}
+
+@keyframes reel-shimmer {
+  0% {
+    opacity: 0.3;
+    transform: translateY(-6px);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 0.3;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes symbol-flicker {
+  0%,
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateY(6px);
+    opacity: 0.6;
   }
 }

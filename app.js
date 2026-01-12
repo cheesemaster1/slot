@@ -14,13 +14,13 @@ const heatFill = document.getElementById("heat-fill");
 const freeSpinsEl = document.getElementById("free-spins");
 
 const symbols = [
-  { id: "rose", label: "Rose", payout: 2 },
-  { id: "heels", label: "Heels", payout: 2 },
-  { id: "lace", label: "Lace", payout: 3 },
-  { id: "mask", label: "Mask", payout: 4 },
-  { id: "vip", label: "VIP", payout: 6 },
-  { id: "wild", label: "Wild", payout: 5, isWild: true },
-  { id: "scatter", label: "Scatter", payout: 0, isScatter: true },
+  { id: "rose", label: "Rose", icon: "🌹", payout: 2 },
+  { id: "heels", label: "Heels", icon: "👠", payout: 2 },
+  { id: "lace", label: "Lace", icon: "🕸️", payout: 3 },
+  { id: "mask", label: "Mask", icon: "🎭", payout: 4 },
+  { id: "vip", label: "VIP", icon: "💎", payout: 6 },
+  { id: "wild", label: "Wild", icon: "✨", payout: 5, isWild: true },
+  { id: "scatter", label: "Scatter", icon: "🌙", payout: 0, isScatter: true },
 ];
 
 const paytable = {
@@ -43,7 +43,6 @@ const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const updateUI = () => {
   balanceEl.textContent = balance;
   betEl.textContent = bet;
-  winEl.textContent = 0;
   heatFill.style.width = `${heat}%`;
   freeSpinsEl.textContent = freeSpins;
 };
@@ -65,7 +64,13 @@ const renderReels = (matrix) => {
     reelSymbols.forEach((symbol) => {
       const tile = document.createElement("div");
       tile.className = `symbol ${symbol.isWild ? "wild" : ""} ${symbol.isScatter ? "scatter" : ""}`;
-      tile.textContent = symbol.label;
+      const icon = document.createElement("div");
+      icon.className = "symbol-icon";
+      icon.textContent = symbol.icon;
+      const label = document.createElement("div");
+      label.className = "symbol-label";
+      label.textContent = symbol.label;
+      tile.append(icon, label);
       reel.appendChild(tile);
     });
   });
@@ -110,6 +115,7 @@ const spin = () => {
 
   spinning = true;
   spinButton.disabled = true;
+  reels.forEach((reel) => reel.classList.add("spinning"));
 
   if (freeSpins === 0) {
     balance -= bet;
@@ -117,38 +123,41 @@ const spin = () => {
     freeSpins -= 1;
   }
 
-  let matrix = reels.map(createReelSymbols);
-  matrix = applyHeat(matrix);
-  renderReels(matrix);
+  window.setTimeout(() => {
+    let matrix = reels.map(createReelSymbols);
+    matrix = applyHeat(matrix);
+    renderReels(matrix);
 
-  const lineResult = evaluatePayline(matrix);
-  const scatterCount = countScatters(matrix);
-  let totalWin = lineResult.win;
+    const lineResult = evaluatePayline(matrix);
+    const scatterCount = countScatters(matrix);
+    const totalWin = lineResult.win;
 
-  if (lineResult.win > 0) {
-    heat = clamp(heat + 25, 0, 100);
-  } else {
-    heat = clamp(heat + 10, 0, 100);
-  }
+    if (lineResult.win > 0) {
+      heat = clamp(heat + 25, 0, 100);
+    } else {
+      heat = clamp(heat + 10, 0, 100);
+    }
 
-  if (scatterCount >= 3) {
-    freeSpins += 5;
-    resultEl.textContent = "After Dark triggered! +5 free spins.";
-  } else {
-    resultEl.textContent = lineResult.label;
-  }
+    if (scatterCount >= 3) {
+      freeSpins += 5;
+      resultEl.textContent = "After Dark triggered! +5 free spins.";
+    } else {
+      resultEl.textContent = lineResult.label;
+    }
 
-  if (freeSpins > 0 && totalWin >= bet * 4) {
-    freeSpins += 2;
-    resultEl.textContent = "Hot win! +2 extra free spins.";
-  }
+    if (freeSpins > 0 && totalWin >= bet * 4) {
+      freeSpins += 2;
+      resultEl.textContent = "Hot win! +2 extra free spins.";
+    }
 
-  balance += totalWin;
-  winEl.textContent = totalWin;
-  updateUI();
+    balance += totalWin;
+    winEl.textContent = totalWin;
+    updateUI();
 
-  spinning = false;
-  spinButton.disabled = false;
+    reels.forEach((reel) => reel.classList.remove("spinning"));
+    spinning = false;
+    spinButton.disabled = false;
+  }, 650);
 };
 
 betDown.addEventListener("click", () => {
