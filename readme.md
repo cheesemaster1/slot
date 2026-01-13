@@ -1,28 +1,29 @@
-# Neon Nights Slot Prototype
+# Neon Nights Slot Prototype (Unity)
 
-A lightweight HTML/CSS/JS prototype for a playful, neon-themed slot game concept. It focuses on core gameplay loops and a few unique mechanics to evolve later with higher fidelity assets and bonus features.
+This project now targets Unity for the production-ready slot experience. The web prototype is kept for quick UI iteration, but the Unity project is the source of truth for gameplay and animation work moving forward.
 
-## Run locally
+## Unity project
 
-### Option 1: Node static server
+The Unity project lives in `UnitySlotPrototype/`. Open it in Unity 2022.3 LTS or newer.
+
+### Key scripts
+
+- `SlotController.cs` handles reel layout, spins, paylines, and win evaluation.
+- `SlotSpinAnimator.cs` provides a reusable reel spin animation that can be wired to UI or 3D reels.
+
+### Quick setup
+
+1. Open `UnitySlotPrototype/` in Unity Hub.
+2. Create a scene and add an empty `SlotController` GameObject.
+3. Assign symbols (ScriptableObject or inspector entries) and hook up your reel visuals.
+4. Add a `SlotSpinAnimator` to the reel container and assign reel transforms.
+
+## Legacy web prototype
+
+You can still open `index.html` directly for a quick visual reference or run the Node server:
 
 ```bash
 npm run dev
 ```
 
-Then open `http://localhost:8000`.
-
-### Option 2: Python static server
-
-```bash
-python -m http.server 8000
-```
-
-Then open `http://localhost:8000/index.html`.
-
-## Mechanics included
-
-- Heat Meter upgrades symbols to wilds on the next spin once filled.
-- Neon Wild substitutes for any symbol and pays 5x on a 3-of-a-kind.
-- After Dark Scatter triggers 5 free spins on 3 scatters.
-- Hot wins during free spins award +2 extra spins.
+Then visit `http://localhost:8000`.
