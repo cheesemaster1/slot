@@ -29,16 +29,22 @@ public class SlotController : MonoBehaviour
     public event Action<int> OnBalanceChanged;
     public event Action<int> OnWin;
     public event Action<string> OnResult;
+    public event Action<SlotSymbolDefinition[,]> OnGridUpdated;
+
+    public int Columns => columns;
+    public int Rows => rows;
 
     private void Awake()
     {
         balance = startingBalance;
         currentGrid = new SlotSymbolDefinition[columns, rows];
+        EnsureDefaultSymbols();
         if (paylines.Count == 0)
         {
             paylines = PaylineLibrary.DefaultPaylines(columns, rows);
         }
         OnBalanceChanged?.Invoke(balance);
+        PopulateInitialGrid();
     }
 
     public void Spin()
@@ -105,6 +111,37 @@ public class SlotController : MonoBehaviour
         OnBalanceChanged?.Invoke(balance);
         OnWin?.Invoke(lastWin);
         OnResult?.Invoke(lastWin > 0 ? $"Win {lastWin}!" : "No win");
+        OnGridUpdated?.Invoke(currentGrid);
+    }
+
+    private void PopulateInitialGrid()
+    {
+        for (int column = 0; column < columns; column++)
+        {
+            for (int row = 0; row < rows; row++)
+            {
+                currentGrid[column, row] = SlotSymbolPicker.Pick(symbols);
+            }
+        }
+        OnGridUpdated?.Invoke(currentGrid);
+    }
+
+    private void EnsureDefaultSymbols()
+    {
+        if (symbols != null && symbols.Length > 0)
+        {
+            return;
+        }
+
+        symbols = new[]
+        {
+            new SlotSymbolDefinition { id = "rose", displayName = "🌹 Rose", payout = 2 },
+            new SlotSymbolDefinition { id = "heels", displayName = "👠 Heels", payout = 2 },
+            new SlotSymbolDefinition { id = "lace", displayName = "🕸 Lace", payout = 3 },
+            new SlotSymbolDefinition { id = "mask", displayName = "🎭 Mask", payout = 4 },
+            new SlotSymbolDefinition { id = "vip", displayName = "💎 VIP", payout = 6 },
+            new SlotSymbolDefinition { id = "wild", displayName = "✨ Wild", payout = 5, isWild = true },
+        };
     }
 }
 
@@ -125,6 +162,7 @@ public class Payline
 public class SlotSymbolDefinition
 {
     public string id;
+    public string displayName;
     public int payout;
     public bool isWild;
 }

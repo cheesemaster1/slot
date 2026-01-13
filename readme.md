@@ -15,8 +15,9 @@ The Unity project lives in `UnitySlotPrototype/`. Open it in Unity 6000.3.3f1 (o
 
 1. Open `UnitySlotPrototype/` in Unity Hub.
 2. Load the included `Assets/Scenes/SlotPrototype.unity` scene.
-3. Assign symbols (ScriptableObject or inspector entries) and hook up your reel visuals.
-4. In the scene, wire `SlotSpinAnimator` to your reel transforms if you replace the placeholder container.
+3. Press Play to see the runtime UI panel and placeholder symbols render.
+4. Assign symbols (ScriptableObject or inspector entries) and hook up your reel visuals.
+5. In the scene, wire `SlotSpinAnimator` to your reel transforms if you replace the placeholder container.
 
 ## Legacy web prototype
 
