@@ -14,9 +14,9 @@ The Unity project lives in `UnitySlotPrototype/`. Open it in Unity 2022.3 LTS or
 ### Quick setup
 
 1. Open `UnitySlotPrototype/` in Unity Hub.
-2. Create a scene and add an empty `SlotController` GameObject.
+2. Load the included `Assets/Scenes/SlotPrototype.unity` scene.
 3. Assign symbols (ScriptableObject or inspector entries) and hook up your reel visuals.
-4. Add a `SlotSpinAnimator` to the reel container and assign reel transforms.
+4. In the scene, wire `SlotSpinAnimator` to your reel transforms if you replace the placeholder container.
 
 ## Legacy web prototype
 
