@@ -4,7 +4,7 @@ This project now targets Unity for the production-ready slot experience. The web
 
 ## Unity project
 
-The Unity project lives in `UnitySlotPrototype/`. Open it in Unity 2022.3 LTS or newer.
+The Unity project lives in `UnitySlotPrototype/`. Open it in Unity 6000.3.3f1 (or newer 6000.3.x).
 
 ### Key scripts
 
