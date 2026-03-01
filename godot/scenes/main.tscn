@@ -1,0 +1,202 @@
+[gd_scene load_steps=2 format=3 uid="uid://c1l0v3lfb6p07"]
+
+[ext_resource type="Script" path="res://scripts/ui/main.gd" id="1_qf7wj"]
+
+[node name="Main" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_qf7wj")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBox" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="MarginContainer/VBox"]
+layout_mode = 2
+text = "Dragon & Knight Slot - Visual Skeleton"
+
+[node name="Controls" type="HBoxContainer" parent="MarginContainer/VBox"]
+layout_mode = 2
+
+[node name="BetLabel" type="Label" parent="MarginContainer/VBox/Controls"]
+layout_mode = 2
+text = "Bet:"
+
+[node name="BetInput" type="SpinBox" parent="MarginContainer/VBox/Controls"]
+unique_name_in_owner = true
+layout_mode = 2
+min_value = 1.0
+max_value = 100.0
+value = 1.0
+
+[node name="BonusToggle" type="CheckButton" parent="MarginContainer/VBox/Controls"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Force Bonus Mode"
+
+[node name="SpinButton" type="Button" parent="MarginContainer/VBox/Controls"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "SPIN"
+
+[node name="BonusStatus" type="Label" parent="MarginContainer/VBox/Controls"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
+
+[node name="BoardRow" type="HBoxContainer" parent="MarginContainer/VBox"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="DragonSprite" type="TextureRect" parent="MarginContainer/VBox/BoardRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 520)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="GridArea" type="Control" parent="MarginContainer/VBox/BoardRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(680, 520)
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Grid" type="GridContainer" parent="MarginContainer/VBox/BoardRow/GridArea"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+columns = 5
+
+[node name="PaylineLine" type="Line2D" parent="MarginContainer/VBox/BoardRow/GridArea"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+width = 8.0
+default_color = Color(0.407843, 0.886275, 0.443137, 1)
+
+[node name="KnightSlashLine" type="Line2D" parent="MarginContainer/VBox/BoardRow/GridArea"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+width = 10.0
+default_color = Color(0.952941, 0.231373, 0.231373, 1)
+
+[node name="WinPopup" type="Label" parent="MarginContainer/VBox/BoardRow/GridArea"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+offset_left = 260.0
+offset_top = 230.0
+offset_right = 420.0
+offset_bottom = 300.0
+theme_override_font_sizes/font_size = 44
+text = "+0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BonusSplash" type="Label" parent="MarginContainer/VBox/BoardRow/GridArea"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -80.0
+offset_right = 240.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 42
+text = "BONUS COMPLETE"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BonusIntroOverlay" type="ColorRect" parent="MarginContainer/VBox/BoardRow/GridArea"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.82)
+
+[node name="BonusIntroVBox" type="VBoxContainer" parent="MarginContainer/VBox/BoardRow/GridArea/BonusIntroOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -220.0
+offset_top = -130.0
+offset_right = 220.0
+offset_bottom = 130.0
+grow_horizontal = 2
+grow_vertical = 2
+alignment = 1
+
+[node name="BonusIntroTitle" type="Label" parent="MarginContainer/VBox/BoardRow/GridArea/BonusIntroOverlay/BonusIntroVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 52
+text = "DRAGON TALES"
+horizontal_alignment = 1
+
+[node name="BonusIntroBody" type="Label" parent="MarginContainer/VBox/BoardRow/GridArea/BonusIntroOverlay/BonusIntroVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_font_sizes/font_size = 26
+text = "10 Free Spins"
+horizontal_alignment = 1
+
+[node name="BonusIntroContinue" type="Button" parent="MarginContainer/VBox/BoardRow/GridArea/BonusIntroOverlay/BonusIntroVBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "CONTINUE"
+
+[node name="KnightSprite" type="TextureRect" parent="MarginContainer/VBox/BoardRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(180, 520)
+layout_mode = 2
+expand_mode = 1
+stretch_mode = 5
+
+[node name="ResultLabel" type="RichTextLabel" parent="MarginContainer/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+custom_minimum_size = Vector2(0, 170)
+bbcode_enabled = true
+fit_content = false
+scroll_following = true
