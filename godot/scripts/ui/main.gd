@@ -380,30 +380,55 @@ func _set_cell_visual(reel: int, row: int, symbol: String, is_fire: bool, multip
 
 func _load_generated_symbol_textures() -> void:
 	var asset_aliases := _asset_aliases()
+	var explicit_paths := _explicit_asset_paths()
 	var symbol_ids: Array[String] = ["10", "J", "Q", "K", "A", "SWORD", "SHIELD", "HELMET", "DRAGON_EYE", "WILD", "SCATTER", "DRAGON"]
 	for symbol in symbol_ids:
-		var tex := _load_texture_from_roots_with_variants(
-			["res://assets/generated/symbols", "res://assets/symbols"],
-			_build_asset_name_variants(symbol, asset_aliases.get(symbol, [])),
-			["png", "webp", "jpg", "jpeg", "svg"]
-		)
+		var tex := _load_texture_from_full_paths(explicit_paths.get(symbol, []))
+		if tex == null:
+			tex = _load_texture_from_roots_with_variants(
+				["res://assets/generated/symbols", "res://assets/symbols"],
+				_build_asset_name_variants(symbol, asset_aliases.get(symbol, [])),
+				["png", "webp", "jpg", "jpeg", "svg"]
+			)
 		if tex != null:
 			_symbol_textures[symbol] = tex
 
-	var dragon_tex := _load_texture_from_roots_with_variants(
-		["res://assets/generated/characters", "res://assets/characters"],
-		_build_asset_name_variants("dragon", asset_aliases.get("CHAR_DRAGON", [])),
-		["png", "webp", "jpg", "jpeg", "svg"]
-	)
+	var dragon_tex := _load_texture_from_full_paths(explicit_paths.get("CHAR_DRAGON", []))
+	if dragon_tex == null:
+		dragon_tex = _load_texture_from_roots_with_variants(
+			["res://assets/generated/characters", "res://assets/characters"],
+			_build_asset_name_variants("dragon", asset_aliases.get("CHAR_DRAGON", [])),
+			["png", "webp", "jpg", "jpeg", "svg"]
+		)
 	if dragon_tex != null:
 		_symbol_textures["CHAR_DRAGON"] = dragon_tex
-	var knight_tex := _load_texture_from_roots_with_variants(
-		["res://assets/generated/characters", "res://assets/characters"],
-		_build_asset_name_variants("knight", asset_aliases.get("CHAR_KNIGHT", [])),
-		["png", "webp", "jpg", "jpeg", "svg"]
-	)
+	var knight_tex := _load_texture_from_full_paths(explicit_paths.get("CHAR_KNIGHT", []))
+	if knight_tex == null:
+		knight_tex = _load_texture_from_roots_with_variants(
+			["res://assets/generated/characters", "res://assets/characters"],
+			_build_asset_name_variants("knight", asset_aliases.get("CHAR_KNIGHT", [])),
+			["png", "webp", "jpg", "jpeg", "svg"]
+		)
 	if knight_tex != null:
 		_symbol_textures["CHAR_KNIGHT"] = knight_tex
+
+func _explicit_asset_paths() -> Dictionary:
+	return {
+		"10": ["res://assets/symbols/10-stylizedsymbo.png", "res://assets/symbols/10-stylizedsymbol.png", "res://assets/symbols/10.png"],
+		"J": ["res://assets/symbols/J-stylizedsymbol.png", "res://assets/symbols/J.png"],
+		"Q": ["res://assets/symbols/Q-stylizedsymbol.png", "res://assets/symbols/Q.png"],
+		"K": ["res://assets/symbols/K-stylizedsymbol.png", "res://assets/symbols/K.png"],
+		"A": ["res://assets/symbols/A-stylizedSymbol.png", "res://assets/symbols/A-stylizedsymbol.png", "res://assets/symbols/A.png"],
+		"SWORD": ["res://assets/symbols/Sword-stylized Symbol.png", "res://assets/symbols/Sword-stylizedsymbol.png", "res://assets/symbols/SWORD.png"],
+		"SHIELD": ["res://assets/symbols/Shield-stylilzedsymbol.png", "res://assets/symbols/Shield-stylizedsymbol.png", "res://assets/symbols/SHIELD.png"],
+		"HELMET": ["res://assets/symbols/Helmet-stylizedsymbol.png", "res://assets/symbols/HELMET.png"],
+		"DRAGON_EYE": ["res://assets/symbols/Dragoneye-stylizedsymbol.png", "res://assets/symbols/DragonEye-stylizedsymbol.png", "res://assets/symbols/DRAGON_EYE.png"],
+		"WILD": ["res://assets/symbols/WILD-stylizedsymbol.png", "res://assets/symbols/WILD.png"],
+		"SCATTER": ["res://assets/symbols/Scatter-stylizedsymbol.png", "res://assets/symbols/SCATTER.png"],
+		"DRAGON": ["res://assets/symbols/Dragonfire-sylizedsymbol.png", "res://assets/symbols/Dragonfire-stylizedsymbol.png", "res://assets/symbols/DRAGON.png"],
+		"CHAR_DRAGON": ["res://assets/characters/Dragon side panel.png", "res://assets/characters/dragon.png"],
+		"CHAR_KNIGHT": ["res://assets/characters/knight side panel.png", "res://assets/characters/Knight side panel.png", "res://assets/characters/knight.png"]
+	}
 
 func _asset_aliases() -> Dictionary:
 	return {
@@ -444,6 +469,13 @@ func _load_texture_from_roots_with_variants(base_dirs: Array[String], name_varia
 				var tex := _load_texture_from_file(path)
 				if tex != null:
 					return tex
+	return null
+
+func _load_texture_from_full_paths(paths: Array) -> Texture2D:
+	for path in paths:
+		var tex := _load_texture_from_file(str(path))
+		if tex != null:
+			return tex
 	return null
 
 func _load_texture_from_file(res_path: String) -> Texture2D:
