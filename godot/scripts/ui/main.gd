@@ -40,6 +40,10 @@ var _symbol_textures: Dictionary = {}
 func _ready() -> void:
 	_load_generated_symbol_textures()
 	_set_side_character_panels()
+	if not _dragon_sprite.resized.is_connected(_on_side_panel_resized):
+		_dragon_sprite.resized.connect(_on_side_panel_resized)
+	if not _knight_sprite.resized.is_connected(_on_side_panel_resized):
+		_knight_sprite.resized.connect(_on_side_panel_resized)
 	_build_grid_cells(5, 5)
 
 	_config = _load_config("res://data/game_config.json")
@@ -78,14 +82,27 @@ func _set_side_label(host: TextureRect, text: String) -> void:
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	label.layout_mode = 1
-	label.anchors_preset = 15
+	label.set_anchors_preset(Control.PRESET_FULL_RECT)
 	label.anchor_right = 1.0
 	label.anchor_bottom = 1.0
-	label.grow_horizontal = 2
-	label.grow_vertical = 2
+	label.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	label.grow_vertical = Control.GROW_DIRECTION_BOTH
+	label.position = Vector2.ZERO
+	label.size = host.size
+	label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	label.add_theme_font_size_override("font_size", 38)
 	label.add_theme_color_override("font_color", Color(1, 1, 1, 1))
+	label.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.95))
+	label.add_theme_constant_override("outline_size", 3)
 	host.add_child(label)
+
+func _on_side_panel_resized() -> void:
+	for host in [_dragon_sprite, _knight_sprite]:
+		if host == null:
+			continue
+		for child in host.get_children():
+			if child is Label:
+				(child as Label).size = host.size
 func _build_grid_cells(reels: int, rows: int) -> void:
 	for child in _grid.get_children():
 		child.queue_free()
@@ -350,11 +367,15 @@ func _set_cell_visual(reel: int, row: int, symbol: String, is_fire: bool, multip
 	if _symbol_textures.has(symbol):
 		icon.texture = _symbol_textures[symbol]
 		icon.visible = true
-		txt.text = ""
+		txt.text = symbol
+		txt.add_theme_font_size_override("font_size", 13)
+		txt.vertical_alignment = VERTICAL_ALIGNMENT_BOTTOM
 	else:
 		icon.texture = null
 		icon.visible = false
 		txt.text = symbol
+		txt.add_theme_font_size_override("font_size", 30)
+		txt.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	mul.text = "x%s" % multiplier if multiplier > 0 else ""
 
 func _load_generated_symbol_textures() -> void:
@@ -426,6 +447,10 @@ func _load_texture_from_roots_with_variants(base_dirs: Array[String], name_varia
 	return null
 
 func _load_texture_from_file(res_path: String) -> Texture2D:
+	if ResourceLoader.exists(res_path):
+		var loaded := load(res_path)
+		if loaded is Texture2D:
+			return loaded
 	var abs_path := ProjectSettings.globalize_path(res_path)
 	if not FileAccess.file_exists(abs_path):
 		return null
