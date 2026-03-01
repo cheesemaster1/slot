@@ -32,6 +32,21 @@ You can then run checks/headless load from repo root:
    - click **SPIN**
 4. Inspect generated grid, fire cells, multiplier cells, and line wins in the result panel.
 
+## Checked-in progress screenshots
+
+To capture screenshots that are committed to the repo (so you can review progress without running locally):
+
+```bash
+./scripts/capture_screenshots.sh
+```
+
+This writes:
+- `docs/screenshots/godot_progress_1.svg`
+- `docs/screenshots/godot_progress_2.svg`
+
+These files are tracked in git and intended for quick visual PR review.
+The screenshots are committed as text-based SVG files with embedded JPEG data so review tools that reject binary diffs can still handle them.
+
 ## Placeholder art assets
 
 I added simple generated placeholder SVG assets for all current symbols plus side characters:
@@ -52,6 +67,17 @@ The art is stored as text-based SVG files (not binary PNG) to avoid branch/updat
   - `slot_math.gd` — line/scatter evaluation
   - `spin_engine.gd` — spin generation + feature resolution
   - `ui/main.gd` — UI glue for debug spin loop
+
+## Payout table (bet = 1)
+
+This prototype now evaluates line wins for 3/4/5-of-a-kind from left to right using the provided payout values (ordered from lowest to highest symbol value).
+
+## UI/feedback improvements in this iteration
+
+- Symbols now render as centered text labels in each tile for readability during fast prototyping.
+- Reel spin sequence animates reel-by-reel before final result settles.
+- Winning paylines animate with a moving line overlay.
+- A floating `+win` popup appears on the grid for each line win.
 
 ## Current scope
 
