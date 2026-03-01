@@ -35,8 +35,10 @@ var _in_bonus := false
 var _bonus_spins_left := 0
 var _bonus_total_win := 0.0
 var _reel_slow_roll_active := false
+var _symbol_textures: Dictionary = {}
 
 func _ready() -> void:
+	_load_generated_symbol_textures()
 	_set_side_character_panels()
 	_build_grid_cells(5, 5)
 
@@ -52,12 +54,21 @@ func _ready() -> void:
 
 
 func _set_side_character_panels() -> void:
-	_dragon_sprite.texture = null
-	_knight_sprite.texture = null
-	_dragon_sprite.modulate = Color(0.55, 0.28, 0.78, 1)
-	_knight_sprite.modulate = Color(0.25, 0.44, 0.86, 1)
-	_set_side_label(_dragon_sprite, "DRAGON")
-	_set_side_label(_knight_sprite, "KNIGHT")
+	if _symbol_textures.has("CHAR_DRAGON"):
+		_dragon_sprite.texture = _symbol_textures["CHAR_DRAGON"]
+		_dragon_sprite.modulate = Color(1, 1, 1, 1)
+	else:
+		_dragon_sprite.texture = null
+		_dragon_sprite.modulate = Color(0.55, 0.28, 0.78, 1)
+		_set_side_label(_dragon_sprite, "DRAGON")
+
+	if _symbol_textures.has("CHAR_KNIGHT"):
+		_knight_sprite.texture = _symbol_textures["CHAR_KNIGHT"]
+		_knight_sprite.modulate = Color(1, 1, 1, 1)
+	else:
+		_knight_sprite.texture = null
+		_knight_sprite.modulate = Color(0.25, 0.44, 0.86, 1)
+		_set_side_label(_knight_sprite, "KNIGHT")
 
 func _set_side_label(host: TextureRect, text: String) -> void:
 	for child in host.get_children():
@@ -108,6 +119,23 @@ func _build_grid_cells(reels: int, rows: int) -> void:
 			txt.add_theme_font_size_override("font_size", 30)
 			txt.add_theme_color_override("font_color", Color.WHITE)
 			cell.add_child(txt)
+
+			var icon := TextureRect.new()
+			icon.name = "Icon"
+			icon.layout_mode = 1
+			icon.anchors_preset = 8
+			icon.anchor_left = 0.5
+			icon.anchor_top = 0.5
+			icon.anchor_right = 0.5
+			icon.anchor_bottom = 0.5
+			icon.offset_left = -38
+			icon.offset_top = -38
+			icon.offset_right = 38
+			icon.offset_bottom = 38
+			icon.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			icon.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			icon.visible = false
+			cell.add_child(icon)
 
 			var mul := Label.new()
 			mul.name = "Mul"
@@ -310,6 +338,7 @@ func _set_cell_visual(reel: int, row: int, symbol: String, is_fire: bool, multip
 		return
 	var bg: ColorRect = cell.get_node("Bg")
 	var txt: Label = cell.get_node("Txt")
+	var icon: TextureRect = cell.get_node("Icon")
 	var mul: Label = cell.get_node("Mul")
 
 	var base: Color = _symbol_colors.get(symbol, Color("1f3b73"))
@@ -318,8 +347,39 @@ func _set_cell_visual(reel: int, row: int, symbol: String, is_fire: bool, multip
 	elif is_fire:
 		base = base.lightened(0.18)
 	bg.color = base
-	txt.text = symbol
+	if _symbol_textures.has(symbol):
+		icon.texture = _symbol_textures[symbol]
+		icon.visible = true
+		txt.text = ""
+	else:
+		icon.texture = null
+		icon.visible = false
+		txt.text = symbol
 	mul.text = "x%s" % multiplier if multiplier > 0 else ""
+
+func _load_generated_symbol_textures() -> void:
+	var symbol_ids: Array[String] = ["10", "J", "Q", "K", "A", "SWORD", "SHIELD", "HELMET", "DRAGON_EYE", "WILD", "SCATTER", "DRAGON"]
+	for symbol in symbol_ids:
+		var path := "res://assets/generated/symbols/%s.png" % symbol
+		var tex := _load_texture_from_file(path)
+		if tex != null:
+			_symbol_textures[symbol] = tex
+
+	var dragon_tex := _load_texture_from_file("res://assets/generated/characters/dragon.png")
+	if dragon_tex != null:
+		_symbol_textures["CHAR_DRAGON"] = dragon_tex
+	var knight_tex := _load_texture_from_file("res://assets/generated/characters/knight.png")
+	if knight_tex != null:
+		_symbol_textures["CHAR_KNIGHT"] = knight_tex
+
+func _load_texture_from_file(res_path: String) -> Texture2D:
+	var abs_path := ProjectSettings.globalize_path(res_path)
+	if not FileAccess.file_exists(abs_path):
+		return null
+	var image := Image.load_from_file(abs_path)
+	if image == null or image.is_empty():
+		return null
+	return ImageTexture.create_from_image(image)
 
 func _animate_wins(result: Dictionary) -> void:
 	var wins: Array = result.get("wins", [])

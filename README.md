@@ -56,6 +56,44 @@ I added simple generated placeholder SVG assets for all current symbols plus sid
 These are temporary stand-ins so we can test layout and gameplay flow before final art.
 The art is stored as text-based SVG files (not binary PNG) to avoid branch/update issues with binary-file restrictions.
 
+## ChatGPT image-generator asset workflow
+
+This repo can use externally generated PNG assets (including those made with ChatGPT image generation), but this container cannot call that image generator API directly.
+
+### 1) Generate assets outside this container
+
+Create PNG files with these exact names:
+
+- Symbols (`symbols/`):
+  - `10.png`, `J.png`, `Q.png`, `K.png`, `A.png`
+  - `SWORD.png`, `SHIELD.png`, `HELMET.png`, `DRAGON_EYE.png`
+  - `WILD.png`, `SCATTER.png`, `DRAGON.png`
+- Characters (`characters/`):
+  - `dragon.png`, `knight.png`
+
+### 2) Drop files into input folder
+
+Put them under:
+
+```text
+artifacts/generated_input/
+  symbols/*.png
+  characters/*.png
+```
+
+### 3) Import into the Godot project
+
+```bash
+./scripts/import_generated_assets.sh
+```
+
+This copies files to:
+
+- `godot/assets/generated/symbols/*.png`
+- `godot/assets/generated/characters/*.png`
+
+The game UI auto-loads these generated PNGs at runtime if present, and falls back to text labels if missing.
+
 ## Repository layout
 
 - `docs/slot_design.md` — game design baseline and mechanic notes
