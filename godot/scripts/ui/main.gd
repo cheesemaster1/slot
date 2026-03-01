@@ -168,7 +168,7 @@ func _play_single_spin(is_bonus: bool) -> Dictionary:
 			if reel < 4 and str(pre_fire_grid[reel][row]) == "SCATTER":
 				revealed_scatter_count += 1
 
-		if not _reel_slow_roll_active and reel < 4 and revealed_scatter_count >= 2:
+		if not is_bonus and not _reel_slow_roll_active and reel < 4 and revealed_scatter_count >= 2:
 			_reel_slow_roll_active = true
 			await _show_mid_spin_popup("SCATTER TEASE")
 

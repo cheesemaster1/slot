@@ -7,6 +7,7 @@ const SlotMathScript := preload("res://scripts/slot_math.gd")
 var _rng: RefCounted = RngServiceScript.new()
 var _math: RefCounted = SlotMathScript.new()
 var _config: Dictionary = {}
+var _back_to_back_boost_spins_left := 0
 
 func set_config(config: Dictionary) -> void:
 	_config = config
@@ -18,6 +19,11 @@ func spin(bet: int, is_bonus: bool = false) -> Dictionary:
 	var pre_fire_grid: Array = _build_grid(is_bonus)
 	var scatter_count: int = int(_math.call("count_symbol", pre_fire_grid, "SCATTER"))
 	var bonus_trigger: bool = scatter_count >= int(_config["bonus"]["scatter_trigger"])
+	if not is_bonus:
+		if bonus_trigger:
+			_back_to_back_boost_spins_left = int(_config.get("bonus", {}).get("back_to_back_window_spins", 1))
+		elif _back_to_back_boost_spins_left > 0:
+			_back_to_back_boost_spins_left -= 1
 
 	var grid: Array = _clone_grid(pre_fire_grid)
 	var dragon_resolution: Dictionary = _apply_dragon_fire_from_symbols(grid)
@@ -47,7 +53,12 @@ func _build_grid(is_bonus: bool) -> Array:
 	var rows := int(_config["grid"]["rows"])
 	var mode := "bonus" if is_bonus else "base"
 	var spin_weights: Dictionary = _config.get("spin_weights", {})
-	var weight_map: Dictionary = spin_weights.get(mode, _config["weights"])
+	var weight_map: Dictionary = (spin_weights.get(mode, _config["weights"]) as Dictionary).duplicate()
+	if not is_bonus and _back_to_back_boost_spins_left > 0 and weight_map.has("SCATTER"):
+		var boost := float(_config.get("bonus", {}).get("back_to_back_scatter_weight_multiplier", 1.0))
+		var base_weight := int(weight_map["SCATTER"])
+		var boosted_weight := int(ceil(float(base_weight) * boost))
+		weight_map["SCATTER"] = max(base_weight + 1, boosted_weight)
 
 	var grid: Array = []
 	for x in range(reels):

@@ -34,7 +34,7 @@
     "HELMET": 10,
     "DRAGON_EYE": 8,
     "WILD": 6,
-    "SCATTER": 5,
+    "SCATTER": 3,
     "DRAGON": 3
   },
   "feature_chance": {
@@ -67,7 +67,9 @@
   },
   "bonus": {
     "scatter_trigger": 3,
-    "mode": "single_bonus"
+    "mode": "single_bonus",
+    "back_to_back_scatter_weight_multiplier": 1.2,
+    "back_to_back_window_spins": 1
   },
   "paylines": [
     [
@@ -501,7 +503,7 @@
       "HELMET": 10,
       "DRAGON_EYE": 8,
       "WILD": 6,
-      "SCATTER": 5,
+      "SCATTER": 3,
       "DRAGON": 3
     },
     "bonus": {
@@ -515,7 +517,7 @@
       "HELMET": 10,
       "DRAGON_EYE": 8,
       "WILD": 8,
-      "SCATTER": 7,
+      "SCATTER": 1,
       "DRAGON": 12
     }
   },
