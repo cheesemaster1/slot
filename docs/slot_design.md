@@ -12,13 +12,10 @@
 ## Corrected feature behavior
 
 ### 1) Dragon Breath (vertical partial-to-full wild conversion)
-- Dragon can trigger on any spin based on mode chance.
-- Dragon chooses:
-  - reel index (`0..4`)
-  - **start row** (`0..4`)
-- All cells from `start_row` down to the bottom of that reel become `WILD`.
-  - If start row is top (`0`), full reel becomes wild.
-  - If start row is mid (`2`), lower segment becomes wild.
+- A dedicated `DRAGON` symbol can land on any reel/row.
+- After reels stop, each DRAGON symbol breathes fire down its column.
+- Fire conversion is animated top-to-bottom from the DRAGON position.
+- The DRAGON symbol itself and all symbols below it convert to `WILD` before payline evaluation.
 
 ### 2) Knight Slash (horizontal multiplier carrier)
 - Knight can trigger on any spin based on mode chance.

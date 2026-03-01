@@ -16,7 +16,7 @@ const SpinEngineScript := preload("res://scripts/spin_engine.gd")
 var _engine: RefCounted = SpinEngineScript.new()
 var _cell_map: Dictionary = {}
 var _config: Dictionary = {}
-var _symbol_ids: Array[String] = ["10", "J", "Q", "K", "A", "SWORD", "SHIELD", "HELMET", "DRAGON_EYE", "WILD", "SCATTER"]
+var _symbol_ids: Array[String] = ["10", "J", "Q", "K", "A", "SWORD", "SHIELD", "HELMET", "DRAGON_EYE", "WILD", "SCATTER", "DRAGON"]
 var _symbol_colors := {
 	"10": Color("1f3b73"),
 	"J": Color("1f3b73"),
@@ -28,7 +28,8 @@ var _symbol_colors := {
 	"HELMET": Color("7950f2"),
 	"DRAGON_EYE": Color("c92a2a"),
 	"WILD": Color("e67700"),
-	"SCATTER": Color("c2255c")
+	"SCATTER": Color("c2255c"),
+	"DRAGON": Color("8a2be2")
 }
 var _rng := RandomNumberGenerator.new()
 var _is_spinning := false
@@ -96,26 +97,47 @@ func _play_spin_sequence() -> void:
 	_win_popup.visible = false
 
 	var result: Dictionary = _engine.call("spin", int(_bet_input.value), _bonus_toggle.button_pressed)
+	var pre_fire_grid: Array = result.get("pre_fire_grid", [])
 	var final_grid: Array = result.get("grid", [])
-	if final_grid.is_empty():
+	if pre_fire_grid.is_empty() or final_grid.is_empty():
 		_is_spinning = false
 		_spin_button.disabled = false
 		return
 
-	var reels: int = int(final_grid.size())
-	var rows: int = int(final_grid[0].size())
+	var reels: int = int(pre_fire_grid.size())
+	var rows: int = int(pre_fire_grid[0].size())
 
 	for reel in range(reels):
 		await _spin_single_reel(reel, rows, 0.5)
 		for row in range(rows):
-			_set_cell_visual(reel, row, str(final_grid[reel][row]), false, false)
+			_set_cell_visual(reel, row, str(pre_fire_grid[reel][row]), false, false)
 
+	await _animate_dragon_fire(result)
 	_render_grid(final_grid, result.get("fire_cells", {}), result.get("multiplier_cells", {}))
 	_result_label.text = _format_result(result)
 	await _animate_wins(result)
 
 	_is_spinning = false
 	_spin_button.disabled = false
+
+func _animate_dragon_fire(result: Dictionary) -> void:
+	var fire_steps_all: Array = result.get("dragon_fire_steps", [])
+	if fire_steps_all.is_empty():
+		return
+
+	for dragon_steps in fire_steps_all:
+		if typeof(dragon_steps) != TYPE_ARRAY:
+			continue
+		for step in dragon_steps:
+			if typeof(step) != TYPE_DICTIONARY:
+				continue
+			var reel := int(step.get("reel", -1))
+			var row := int(step.get("row", -1))
+			if reel < 0 or row < 0:
+				continue
+			_set_cell_visual(reel, row, "WILD", true, false)
+			await get_tree().create_timer(0.08).timeout
+		await get_tree().create_timer(0.12).timeout
 
 func _spin_single_reel(reel: int, rows: int, duration: float) -> void:
 	var elapsed := 0.0
@@ -232,9 +254,8 @@ func _format_result(result: Dictionary) -> String:
 	lines.append("Total Win: %.2f" % float(result.get("total_win", 0.0)))
 	lines.append("Line Wins: %s" % (result.get("wins", []) as Array).size())
 	lines.append("Scatters: %s | Bonus Trigger: %s" % [result.get("scatter_count", 0), result.get("bonus_trigger", false)])
-	lines.append("Dragon Reel: %s | Dragon Start Row: %s | Knight Row: %s" % [
-		result.get("dragon_reel", -1),
-		result.get("dragon_start_row", -1),
+	lines.append("Dragon Triggers: %s | Knight Row: %s" % [
+		(result.get("dragon_triggers", []) as Array).size(),
 		result.get("knight_row", -1)
 	])
 	lines.append("Fire Cells: %s" % [result.get("fire_cells", {})])

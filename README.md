@@ -2,7 +2,7 @@
 
 This repository contains a **runnable Godot 4 skeleton** for a 5x5 slot game inspired by RIP City pacing with custom mechanics:
 
-- **Dragon Breath (vertical wild conversion):** Dragon picks one reel and a start row. That reel becomes `WILD` from that row downward.
+- **Dragon Breath (vertical wild conversion):** `DRAGON` symbols can land anywhere on the grid. After reels stop, each DRAGON breathes fire downward in its own column, turning itself and all symbols below into `WILD` before paylines are evaluated.
 - **Knight Slash (horizontal multipliers):** Knight picks one row and applies multipliers only where that row intersects active Dragon fire cells.
 - **Bonus trigger:** 3+ scatters enters bonus logic mode (higher feature chances).
 
