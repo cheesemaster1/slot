@@ -162,16 +162,23 @@ func _animate_wins(result: Dictionary) -> void:
 		if line_index < 0 or line_index >= paylines.size():
 			continue
 		var line: Array = paylines[line_index]
+		if line.size() < 3:
+			continue
 		await _animate_payline(line, float(win.get("amount", 0.0)))
 		await get_tree().create_timer(0.2).timeout
 
 func _animate_payline(line: Array, amount: float) -> void:
+	if not is_instance_valid(_payline_line) or not is_instance_valid(_win_popup):
+		return
 	_payline_line.clear_points()
 	_payline_line.visible = true
 
 	for point in line:
-		var x := int(point[0])
-		var y := int(point[1])
+		if typeof(point) != TYPE_ARRAY or (point as Array).size() < 2:
+			continue
+		var point_arr: Array = point
+		var x := int(point_arr[0])
+		var y := int(point_arr[1])
 		_payline_line.add_point(_cell_center_local(x, y))
 		await get_tree().create_timer(0.08).timeout
 
@@ -190,10 +197,18 @@ func _animate_payline(line: Array, amount: float) -> void:
 	_payline_line.visible = false
 
 func _cell_center_local(reel: int, row: int) -> Vector2:
-	var cell: Control = _cell_map.get(_cell_key(reel, row), null)
-	if cell == null:
+	var reels := int(_config.get("grid", {}).get("reels", 5))
+	var rows := int(_config.get("grid", {}).get("rows", 5))
+	if reels <= 0 or rows <= 0:
 		return Vector2.ZERO
-	return _grid_area.to_local(cell.get_global_rect().get_center())
+
+	var area_size := _grid_area.size
+	if area_size.x <= 0.0 or area_size.y <= 0.0:
+		area_size = Vector2(680, 520)
+
+	var cell_w := area_size.x / float(reels)
+	var cell_h := area_size.y / float(rows)
+	return Vector2((float(reel) + 0.5) * cell_w, (float(row) + 0.5) * cell_h)
 
 func _cell_key(reel: int, row: int) -> String:
 	return "%s,%s" % [reel, row]
