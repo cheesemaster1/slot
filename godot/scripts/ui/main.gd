@@ -12,6 +12,10 @@ const SpinEngineScript := preload("res://scripts/spin_engine.gd")
 @onready var _knight_slash_line: Line2D = %KnightSlashLine
 @onready var _win_popup: Label = %WinPopup
 @onready var _bonus_splash: Label = %BonusSplash
+@onready var _bonus_intro_overlay: ColorRect = %BonusIntroOverlay
+@onready var _bonus_intro_title: Label = %BonusIntroTitle
+@onready var _bonus_intro_body: Label = %BonusIntroBody
+@onready var _bonus_intro_continue: Button = %BonusIntroContinue
 @onready var _dragon_sprite: TextureRect = %DragonSprite
 @onready var _knight_sprite: TextureRect = %KnightSprite
 @onready var _result_label: RichTextLabel = %ResultLabel
@@ -30,10 +34,10 @@ var _is_spinning := false
 var _in_bonus := false
 var _bonus_spins_left := 0
 var _bonus_total_win := 0.0
+var _reel_slow_roll_active := false
 
 func _ready() -> void:
-	_dragon_sprite.texture = load("res://assets/characters/dragon.svg")
-	_knight_sprite.texture = load("res://assets/characters/knight.svg")
+	_set_side_character_panels()
 	_build_grid_cells(5, 5)
 
 	_config = _load_config("res://data/game_config.json")
@@ -41,10 +45,36 @@ func _ready() -> void:
 	_engine.call("set_seed", Time.get_unix_time_from_system())
 
 	_spin_button.pressed.connect(_on_spin_pressed)
+	_bonus_intro_continue.pressed.connect(_on_bonus_intro_continue_pressed)
 	_result_label.text = "Ready. Click SPIN to generate a result."
 	_update_bonus_status()
 	_on_spin_pressed()
 
+
+func _set_side_character_panels() -> void:
+	_dragon_sprite.texture = null
+	_knight_sprite.texture = null
+	_dragon_sprite.modulate = Color(0.55, 0.28, 0.78, 1)
+	_knight_sprite.modulate = Color(0.25, 0.44, 0.86, 1)
+	_set_side_label(_dragon_sprite, "DRAGON")
+	_set_side_label(_knight_sprite, "KNIGHT")
+
+func _set_side_label(host: TextureRect, text: String) -> void:
+	for child in host.get_children():
+		child.queue_free()
+	var label := Label.new()
+	label.text = text
+	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	label.layout_mode = 1
+	label.anchors_preset = 15
+	label.anchor_right = 1.0
+	label.anchor_bottom = 1.0
+	label.grow_horizontal = 2
+	label.grow_vertical = 2
+	label.add_theme_font_size_override("font_size", 38)
+	label.add_theme_color_override("font_color", Color(1, 1, 1, 1))
+	host.add_child(label)
 func _build_grid_cells(reels: int, rows: int) -> void:
 	for child in _grid.get_children():
 		child.queue_free()
@@ -106,6 +136,8 @@ func _on_spin_pressed() -> void:
 
 	var result := await _play_single_spin(_bonus_toggle.button_pressed)
 	if not _in_bonus and bool(result.get("bonus_trigger", false)):
+		await _animate_scatter_trigger(result)
+		await _show_bonus_intro(10)
 		await _run_bonus_spins(10)
 
 	_spin_button.disabled = false
@@ -124,10 +156,21 @@ func _play_single_spin(is_bonus: bool) -> Dictionary:
 
 	var reels: int = int(pre_fire_grid.size())
 	var rows: int = int(pre_fire_grid[0].size())
+	_reel_slow_roll_active = false
+	var revealed_scatter_count := 0
 	for reel in range(reels):
-		await _spin_single_reel(reel, rows, 0.4)
+		var reel_duration := 0.4
+		if _reel_slow_roll_active:
+			reel_duration = 1.0
+		await _spin_single_reel(reel, rows, reel_duration, _reel_slow_roll_active)
 		for row in range(rows):
 			_set_cell_visual(reel, row, str(pre_fire_grid[reel][row]), false, 0)
+			if reel < 4 and str(pre_fire_grid[reel][row]) == "SCATTER":
+				revealed_scatter_count += 1
+
+		if not _reel_slow_roll_active and reel < 4 and revealed_scatter_count >= 2:
+			_reel_slow_roll_active = true
+			await _show_mid_spin_popup("SCATTER TEASE")
 
 	await _animate_dragon_fire(result)
 	await _animate_knight_slash(result)
@@ -145,6 +188,12 @@ func _run_bonus_spins(count: int) -> void:
 	while _bonus_spins_left > 0:
 		var result := await _play_single_spin(true)
 		_bonus_total_win += float(result.get("total_win", 0.0))
+		var added_spins := _bonus_retrigger_spins(int(result.get("scatter_count", 0)))
+		if added_spins > 0:
+			_bonus_spins_left += added_spins
+			_update_bonus_status()
+			await _show_mid_spin_popup("+%s FREE SPINS" % added_spins)
+			await get_tree().create_timer(1.0).timeout
 		_bonus_spins_left -= 1
 		_update_bonus_status()
 		await get_tree().create_timer(0.15).timeout
@@ -159,6 +208,17 @@ func _show_bonus_splash() -> void:
 	_bonus_splash.modulate = Color(1, 1, 1, 1)
 	await get_tree().create_timer(1.4).timeout
 	_bonus_splash.visible = false
+
+func _show_bonus_intro(start_spins: int) -> void:
+	_bonus_intro_title.text = "DRAGON TALES"
+	_bonus_intro_body.text = "%s Free Spins\n2 Scatters = +2 Spins\n3+ Scatters = +4 Spins" % start_spins
+	_bonus_intro_overlay.visible = true
+	_bonus_intro_continue.disabled = false
+	await _bonus_intro_continue.pressed
+	_bonus_intro_overlay.visible = false
+
+func _on_bonus_intro_continue_pressed() -> void:
+	_bonus_intro_continue.disabled = true
 
 func _update_bonus_status() -> void:
 	if _in_bonus:
@@ -220,14 +280,15 @@ func _animate_knight_slash(result: Dictionary) -> void:
 
 	_knight_slash_line.visible = false
 
-func _spin_single_reel(reel: int, rows: int, duration: float) -> void:
+func _spin_single_reel(reel: int, rows: int, duration: float, slow_roll: bool) -> void:
 	var elapsed := 0.0
+	var tick := 0.12 if slow_roll else 0.06
 	while elapsed < duration:
 		for row in range(rows):
 			var symbol := _symbol_ids[_rng.randi_range(0, _symbol_ids.size() - 1)]
 			_set_cell_visual(reel, row, symbol, false, 0)
-		await get_tree().create_timer(0.06).timeout
-		elapsed += 0.06
+		await get_tree().create_timer(tick).timeout
+		elapsed += tick
 
 func _render_grid(grid: Array, fire_cells: Dictionary, multiplier_cells: Dictionary) -> void:
 	var reels := int(grid.size())
@@ -270,6 +331,43 @@ func _animate_wins(result: Dictionary) -> void:
 		if idx < 0 or idx >= paylines.size():
 			continue
 		await _animate_payline(paylines[idx], float(win.get("amount", 0.0)))
+
+func _animate_scatter_trigger(result: Dictionary) -> void:
+	var pre_fire_grid: Array = result.get("pre_fire_grid", [])
+	if pre_fire_grid.is_empty():
+		return
+	var trigger_count := int(_config.get("bonus", {}).get("scatter_trigger", 3))
+	var scatter_cells: Array[Vector2i] = []
+	for reel in range(pre_fire_grid.size()):
+		var column: Array = pre_fire_grid[reel]
+		for row in range(column.size()):
+			if str(column[row]) == "SCATTER":
+				scatter_cells.append(Vector2i(reel, row))
+	if scatter_cells.size() < trigger_count:
+		return
+
+	for _pulse in range(3):
+		for pos in scatter_cells:
+			_set_cell_visual(pos.x, pos.y, "SCATTER", true, 0)
+		await get_tree().create_timer(0.14).timeout
+		for pos in scatter_cells:
+			_set_cell_visual(pos.x, pos.y, "SCATTER", false, 0)
+		await get_tree().create_timer(0.12).timeout
+
+func _bonus_retrigger_spins(scatter_count: int) -> int:
+	if scatter_count >= 3:
+		return 4
+	if scatter_count >= 2:
+		return 2
+	return 0
+
+func _show_mid_spin_popup(message: String) -> void:
+	_win_popup.text = message
+	_win_popup.visible = true
+	_win_popup.modulate = Color(1, 0.95, 0.55, 1)
+	_win_popup.position = Vector2((_grid_area.size.x * 0.5) - 150, (_grid_area.size.y * 0.5) - 24)
+	await get_tree().create_timer(0.4).timeout
+	_win_popup.visible = false
 
 func _animate_payline(line: Array, amount: float) -> void:
 	_payline_line.clear_points()
