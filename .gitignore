@@ -1,0 +1,6 @@
+# Portable local Godot install (downloaded by scripts/setup_godot4.sh)
+tools/godot/
+# Godot imported cache
+godot/.godot/
+# Local screenshots / temp artifacts
+artifacts/
