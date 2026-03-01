@@ -47,12 +47,17 @@ value = 1.0
 [node name="BonusToggle" type="CheckButton" parent="MarginContainer/VBox/Controls"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Bonus Mode"
+text = "Force Bonus Mode"
 
 [node name="SpinButton" type="Button" parent="MarginContainer/VBox/Controls"]
 unique_name_in_owner = true
 layout_mode = 2
 text = "SPIN"
+
+[node name="BonusStatus" type="Label" parent="MarginContainer/VBox/Controls"]
+unique_name_in_owner = true
+layout_mode = 2
+text = ""
 
 [node name="BoardRow" type="HBoxContainer" parent="MarginContainer/VBox"]
 layout_mode = 2
@@ -93,6 +98,18 @@ grow_vertical = 2
 width = 8.0
 default_color = Color(0.407843, 0.886275, 0.443137, 1)
 
+[node name="KnightSlashLine" type="Line2D" parent="MarginContainer/VBox/BoardRow/GridArea"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+width = 10.0
+default_color = Color(0.952941, 0.231373, 0.231373, 1)
+
 [node name="WinPopup" type="Label" parent="MarginContainer/VBox/BoardRow/GridArea"]
 unique_name_in_owner = true
 visible = false
@@ -103,6 +120,24 @@ offset_right = 420.0
 offset_bottom = 300.0
 theme_override_font_sizes/font_size = 44
 text = "+0"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="BonusSplash" type="Label" parent="MarginContainer/VBox/BoardRow/GridArea"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -240.0
+offset_top = -80.0
+offset_right = 240.0
+offset_bottom = 80.0
+theme_override_font_sizes/font_size = 42
+text = "BONUS COMPLETE"
 horizontal_alignment = 1
 vertical_alignment = 1
 

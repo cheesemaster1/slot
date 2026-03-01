@@ -3,7 +3,7 @@
 This repository contains a **runnable Godot 4 skeleton** for a 5x5 slot game inspired by RIP City pacing with custom mechanics:
 
 - **Dragon Breath (vertical wild conversion):** `DRAGON` symbols can land anywhere on the grid. After reels stop, each DRAGON breathes fire downward in its own column, turning itself and all symbols below into `WILD` before paylines are evaluated.
-- **Knight Slash (horizontal multipliers):** Knight picks one row and applies multipliers only where that row intersects active Dragon fire cells.
+- **Knight Slash (horizontal multipliers):** Knight can slash a random row from right to left. If the slash intersects a Dragon-fire column, all wilds in that column become multiplier wilds (`x2` to `x250` using weighted odds). If slash misses all fire columns, a miss is displayed.
 - **Bonus trigger:** 3+ scatters enters bonus logic mode (higher feature chances).
 
 ## Local Godot 4 setup in this repo (portable)
@@ -71,6 +71,12 @@ The art is stored as text-based SVG files (not binary PNG) to avoid branch/updat
 ## Payout table (bet = 1)
 
 This prototype now evaluates line wins for 3/4/5-of-a-kind from left to right using the provided payout values (ordered from lowest to highest symbol value).
+
+## Bonus spins
+
+- Hitting 3+ scatters triggers 10 automatic bonus spins.
+- Bonus mode increases DRAGON spawn chance, Knight slash chance, and high-multiplier frequency.
+- After the 10 spins, a bonus-complete splash shows the total bonus win before returning to normal play.
 
 ## UI/feedback improvements in this iteration
 

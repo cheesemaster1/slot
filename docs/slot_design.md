@@ -19,9 +19,10 @@
 
 ### 2) Knight Slash (horizontal multiplier carrier)
 - Knight can trigger on any spin based on mode chance.
-- Knight chooses one row (`0..4`).
-- Knight **does not** change symbols to wild.
-- Knight only applies multipliers where its row intersects active Dragon fire cells.
+- Knight chooses one row (`0..4`) and performs a horizontal slash.
+- If slash intersects one or more Dragon-fire columns, all wilds in each intersected column become multiplier wilds.
+- Multipliers are weighted (`x2`..`x250`) with high values much rarer.
+- If slash does not intersect any fire column, it is a visible miss.
 
 ### 3) Multiplier placement
 - Multiplier cells can only exist on cells that are both:
@@ -34,7 +35,9 @@
 
 - Trigger: **3 or more scatters** anywhere on grid.
 - Initial implementation: one bonus variant only.
-- Bonus increases Dragon/Knight trigger rates and multiplier range.
+- Trigger awards 10 automatic free bonus spins.
+- Bonus increases Dragon landing/expansion frequency, Knight slash frequency, and high multiplier odds.
+- End-of-bonus splash displays total bonus win.
 
 ## Probability targets (starting point)
 
