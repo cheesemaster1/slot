@@ -358,19 +358,72 @@ func _set_cell_visual(reel: int, row: int, symbol: String, is_fire: bool, multip
 	mul.text = "x%s" % multiplier if multiplier > 0 else ""
 
 func _load_generated_symbol_textures() -> void:
+	var asset_aliases := _asset_aliases()
 	var symbol_ids: Array[String] = ["10", "J", "Q", "K", "A", "SWORD", "SHIELD", "HELMET", "DRAGON_EYE", "WILD", "SCATTER", "DRAGON"]
 	for symbol in symbol_ids:
-		var path := "res://assets/generated/symbols/%s.png" % symbol
-		var tex := _load_texture_from_file(path)
+		var tex := _load_texture_from_roots_with_variants(
+			["res://assets/generated/symbols", "res://assets/symbols"],
+			_build_asset_name_variants(symbol, asset_aliases.get(symbol, [])),
+			["png", "webp", "jpg", "jpeg", "svg"]
+		)
 		if tex != null:
 			_symbol_textures[symbol] = tex
 
-	var dragon_tex := _load_texture_from_file("res://assets/generated/characters/dragon.png")
+	var dragon_tex := _load_texture_from_roots_with_variants(
+		["res://assets/generated/characters", "res://assets/characters"],
+		_build_asset_name_variants("dragon", asset_aliases.get("CHAR_DRAGON", [])),
+		["png", "webp", "jpg", "jpeg", "svg"]
+	)
 	if dragon_tex != null:
 		_symbol_textures["CHAR_DRAGON"] = dragon_tex
-	var knight_tex := _load_texture_from_file("res://assets/generated/characters/knight.png")
+	var knight_tex := _load_texture_from_roots_with_variants(
+		["res://assets/generated/characters", "res://assets/characters"],
+		_build_asset_name_variants("knight", asset_aliases.get("CHAR_KNIGHT", [])),
+		["png", "webp", "jpg", "jpeg", "svg"]
+	)
 	if knight_tex != null:
 		_symbol_textures["CHAR_KNIGHT"] = knight_tex
+
+func _asset_aliases() -> Dictionary:
+	return {
+		"10": ["10-stylizedsymbo", "10-stylizedsymbol"],
+		"J": ["J-stylizedsymbol"],
+		"Q": ["Q-stylizedsymbol"],
+		"K": ["K-stylizedsymbol"],
+		"A": ["A-stylizedSymbol", "A-stylizedsymbol"],
+		"SWORD": ["Sword-stylized Symbol", "Sword-stylizedsymbol"],
+		"SHIELD": ["Shield-stylilzedsymbol", "Shield-stylizedsymbol"],
+		"HELMET": ["Helmet-stylizedsymbol"],
+		"DRAGON_EYE": ["Dragoneye-stylizedsymbol", "DragonEye-stylizedsymbol"],
+		"WILD": ["WILD-stylizedsymbol"],
+		"SCATTER": ["Scatter-stylizedsymbol"],
+		"DRAGON": ["Dragonfire-sylizedsymbol", "Dragonfire-stylizedsymbol"],
+		"CHAR_DRAGON": ["Dragon side panel"],
+		"CHAR_KNIGHT": ["knight side panel", "Knight side panel"]
+	}
+
+func _build_asset_name_variants(asset_id: String, extra_aliases: Array = []) -> Array[String]:
+	var variants: Array[String] = []
+	for raw_name in [asset_id] + extra_aliases:
+		var base := str(raw_name).strip_edges()
+		var normalized := base.to_lower()
+		var underscored := normalized.replace("-", "_").replace(" ", "_")
+		var dashed := underscored.replace("_", "-")
+		var spaced := underscored.replace("_", " ")
+		for variant in [base, base.to_lower(), base.to_upper(), normalized, underscored, dashed, spaced]:
+			if not variants.has(variant):
+				variants.append(variant)
+	return variants
+
+func _load_texture_from_roots_with_variants(base_dirs: Array[String], name_variants: Array[String], extensions: Array[String]) -> Texture2D:
+	for base_dir in base_dirs:
+		for name_variant in name_variants:
+			for ext in extensions:
+				var path := "%s/%s.%s" % [base_dir, name_variant, ext]
+				var tex := _load_texture_from_file(path)
+				if tex != null:
+					return tex
+	return null
 
 func _load_texture_from_file(res_path: String) -> Texture2D:
 	var abs_path := ProjectSettings.globalize_path(res_path)
