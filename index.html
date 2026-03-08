@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Nights: Slot Prototype</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="hero">
+        <div>
+          <p class="tag">Risqué • Neon • High Energy</p>
+          <h1>Neon Nights</h1>
+          <p class="subtitle">
+            A playful, after-dark slot prototype inspired by high-volatility
+            street vibe games.
+          </p>
+        </div>
+        <div class="meters">
+          <div class="meter">
+            <span>Heat Meter</span>
+            <div class="bar">
+              <div class="fill" id="heat-fill"></div>
+            </div>
+          </div>
+          <div class="meter">
+            <span>Free Spins</span>
+            <strong id="free-spins">0</strong>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="slot-window">
+          <div class="reel" id="reel-0"></div>
+          <div class="reel" id="reel-1"></div>
+          <div class="reel" id="reel-2"></div>
+        </section>
+
+        <section class="payline">
+          <div class="line"></div>
+          <p>Payline: middle row</p>
+        </section>
+      </main>
+
+      <aside class="panel">
+        <div class="stat">
+          <span>Balance</span>
+          <strong id="balance">1000</strong>
+        </div>
+        <div class="stat">
+          <span>Bet</span>
+          <div class="bet-controls">
+            <button id="bet-down">-</button>
+            <strong id="bet">25</strong>
+            <button id="bet-up">+</button>
+          </div>
+        </div>
+        <button class="spin" id="spin">Spin</button>
+        <div class="stat">
+          <span>Win</span>
+          <strong id="win">0</strong>
+        </div>
+        <div class="stat">
+          <span>Last Result</span>
+          <div id="result">Welcome to the neon!</div>
+        </div>
+      </aside>
+
+      <section class="rules">
+        <h2>Core Mechanics</h2>
+        <ul>
+          <li><strong>Heat Meter:</strong> builds with any win. At 100%, it upgrades symbols to wilds for the next spin.</li>
+          <li><strong>Neon Wild:</strong> substitutes for any symbol and pays 5x if 3 land on the payline.</li>
+          <li><strong>After Dark Scatter:</strong> land 3 scatter symbols anywhere to trigger 5 free spins.</li>
+          <li><strong>Free Spins:</strong> wins during free spins add +2 spins if you land a win of 4x bet or more.</li>
+        </ul>
+      </section>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
